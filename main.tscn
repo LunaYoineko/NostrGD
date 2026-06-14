@@ -1,0 +1,284 @@
+[gd_scene format=3 uid="uid://sgxtwctfjqqt"]
+
+[ext_resource type="Script" uid="uid://bvhvihrk1ov0p" path="res://main.gd" id="1_wj02o"]
+
+[node name="Control" type="Control" unique_id=2109930511]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wj02o")
+
+[node name="Bg" type="ColorRect" parent="." unique_id=30104175]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.07, 0.08, 0.09, 1)
+
+[node name="Sidebar" type="PanelContainer" parent="." unique_id=1625856421]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 340.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="SidebarInner" type="VBoxContainer" parent="Sidebar" unique_id=1650281316]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="SidebarTitle" type="PanelContainer" parent="Sidebar/SidebarInner" unique_id=780772343]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Sidebar/SidebarInner/SidebarTitle" unique_id=758026182]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "  NostrGD"
+vertical_alignment = 1
+
+[node name="AccountSection" type="PanelContainer" parent="Sidebar/SidebarInner" unique_id=1150329617]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Sidebar/SidebarInner/AccountSection" unique_id=515493004]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SectionLabel" type="Label" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer" unique_id=1537515614]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.65, 1)
+text = "アカウント"
+
+[node name="AuthChoiceHBox" type="HBoxContainer" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer" unique_id=47199046]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LoginChoiceBtn" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/AuthChoiceHBox" unique_id=1371957225]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🔑 ログイン"
+
+[node name="CreateChoiceBtn" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/AuthChoiceHBox" unique_id=637136485]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🆕 新規作成"
+
+[node name="LoginContainer" type="VBoxContainer" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer" unique_id=1892887989]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PrivateKeyInput" type="TextEdit" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/LoginContainer" unique_id=1393609084]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
+theme_override_colors/background_color = Color(0.12, 0.13, 0.16, 1)
+placeholder_text = "nsec1... または hex 秘密鍵"
+
+[node name="LoginConfirmBtn" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/LoginContainer" unique_id=1933704109]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "ログイン"
+
+[node name="CreateContainer" type="VBoxContainer" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer" unique_id=1467917746]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="RegisterNameInput" type="LineEdit" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/CreateContainer" unique_id=396106131]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+placeholder_text = "ユーザー名 (例: @user)"
+
+[node name="RegisterDisplayInput" type="LineEdit" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/CreateContainer" unique_id=156016881]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+placeholder_text = "表示名"
+
+[node name="RegisterPictureInput" type="LineEdit" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/CreateContainer" unique_id=442807604]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+placeholder_text = "アイコン画像 URL"
+
+[node name="RegisterBannerInput" type="LineEdit" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/CreateContainer" unique_id=1876907030]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+placeholder_text = "ヘッダー(バナー)画像 URL"
+
+[node name="RegisterLud16Input" type="LineEdit" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/CreateContainer" unique_id=1045038959]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+placeholder_text = "ウォレットアドレス (lud16)"
+
+[node name="CreateBtnHBox" type="HBoxContainer" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/CreateContainer" unique_id=938831006]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CreateConfirmBtn" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/CreateContainer/CreateBtnHBox" unique_id=684318272]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "作成"
+
+[node name="CreateBackBtn" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/CreateContainer/CreateBtnHBox" unique_id=563533549]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 2
+text = "戻る"
+
+[node name="LoggedInContainer" type="VBoxContainer" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer" unique_id=836834872]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="DisconnectButton" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/LoggedInContainer" unique_id=2136062688]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "切断"
+
+[node name="Sep1" type="HSeparator" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer" unique_id=1659278199]
+layout_mode = 2
+
+[node name="ExtensionLogin" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer" unique_id=1480464038]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "ブラウザ拡張 (NIP-07) でログイン"
+
+[node name="NavSection" type="PanelContainer" parent="Sidebar/SidebarInner" unique_id=339944884]
+layout_mode = 2
+
+[node name="NavMenu" type="VBoxContainer" parent="Sidebar/SidebarInner/NavSection" unique_id=246441741]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="NavTimeline" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=106653480]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "🌐  タイムライン"
+alignment = 0
+
+[node name="NavNotifications" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=279522241]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "🔔  通知"
+alignment = 0
+
+[node name="NavDM" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=1711656785]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "💬  DM"
+alignment = 0
+
+[node name="NavProfile" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=1534435018]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "👤  プロフィール"
+alignment = 0
+
+[node name="NavSettings" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=1423081826]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "⚙️  設定"
+alignment = 0
+
+[node name="StatusSection" type="PanelContainer" parent="Sidebar/SidebarInner" unique_id=1173963993]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="StatusLabel" type="Label" parent="Sidebar/SidebarInner/StatusSection" unique_id=1632219797]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.6, 0.65, 0.7, 1)
+text = "未ログイン"
+autowrap_mode = 3
+
+[node name="MainPanel" type="VBoxContainer" parent="." unique_id=1772484735]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -660.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="SectionHeader" type="PanelContainer" parent="MainPanel" unique_id=445300601]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+
+[node name="HeaderLabel" type="Label" parent="MainPanel/SectionHeader" unique_id=596581300]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "  タイムライン"
+vertical_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainPanel" unique_id=481595205]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Timeline" type="VBoxContainer" parent="MainPanel/ScrollContainer" unique_id=2036629723]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="NotificationsPanel" type="VBoxContainer" parent="MainPanel" unique_id=600896925]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="DMPanel" type="VBoxContainer" parent="MainPanel" unique_id=6065351]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="ProfilePanel" type="VBoxContainer" parent="MainPanel" unique_id=498260078]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="SettingsPanel" type="VBoxContainer" parent="MainPanel" unique_id=1628920022]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="InputBar" type="PanelContainer" parent="MainPanel" unique_id=1856516540]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MainPanel/InputBar" unique_id=482595701]
+layout_mode = 2
+
+[node name="MessageInput" type="LineEdit" parent="MainPanel/InputBar/HBoxContainer" unique_id=126963061]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "テキストを入力..."
+
+[node name="SendButton" type="Button" parent="MainPanel/InputBar/HBoxContainer" unique_id=1644481098]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+text = "送信"
+
+[connection signal="pressed" from="Sidebar/SidebarInner/AccountSection/VBoxContainer/AuthChoiceHBox/LoginChoiceBtn" to="." method="_on_show_login_form"]
+[connection signal="pressed" from="Sidebar/SidebarInner/AccountSection/VBoxContainer/AuthChoiceHBox/CreateChoiceBtn" to="." method="_on_show_create_form"]
+[connection signal="pressed" from="Sidebar/SidebarInner/AccountSection/VBoxContainer/LoginContainer/LoginConfirmBtn" to="." method="_on_login_button_pressed"]
+[connection signal="pressed" from="Sidebar/SidebarInner/AccountSection/VBoxContainer/CreateContainer/CreateBtnHBox/CreateConfirmBtn" to="." method="_on_create_account_button_pressed"]
+[connection signal="pressed" from="Sidebar/SidebarInner/AccountSection/VBoxContainer/CreateContainer/CreateBtnHBox/CreateBackBtn" to="." method="_on_back_to_auth_choice"]
+[connection signal="pressed" from="Sidebar/SidebarInner/AccountSection/VBoxContainer/LoggedInContainer/DisconnectButton" to="." method="_on_disconnect_button_pressed"]
+[connection signal="pressed" from="Sidebar/SidebarInner/AccountSection/VBoxContainer/ExtensionLogin" to="." method="_on_extension_login_button_pressed"]
+[connection signal="pressed" from="Sidebar/SidebarInner/NavSection/NavMenu/NavTimeline" to="." method="_on_nav_timeline"]
+[connection signal="pressed" from="Sidebar/SidebarInner/NavSection/NavMenu/NavNotifications" to="." method="_on_nav_notifications"]
+[connection signal="pressed" from="Sidebar/SidebarInner/NavSection/NavMenu/NavDM" to="." method="_on_nav_dm"]
+[connection signal="pressed" from="Sidebar/SidebarInner/NavSection/NavMenu/NavProfile" to="." method="_on_nav_profile"]
+[connection signal="pressed" from="Sidebar/SidebarInner/NavSection/NavMenu/NavSettings" to="." method="_on_nav_settings"]
+[connection signal="pressed" from="MainPanel/InputBar/HBoxContainer/SendButton" to="." method="_on_send_button_pressed"]

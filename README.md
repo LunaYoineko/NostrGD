@@ -1,1 +1,1 @@
-# NostrGD
+# gd-nostr
