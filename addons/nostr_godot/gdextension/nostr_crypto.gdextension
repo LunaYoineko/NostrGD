@@ -1,0 +1,11 @@
+[configuration]
+entry_symbol = "gdextension_entry"
+compatibility_minimum = "4.1"
+
+[libraries]
+linux.debug.x86_64 = "res://addons/nostr_godot/gdextension/lib/libnostr_crypto.so"
+linux.release.x86_64 = "res://addons/nostr_godot/gdextension/lib/libnostr_crypto.so"
+windows.debug.x86_64 = "res://addons/nostr_godot/gdextension/lib/nostr_crypto.dll"
+windows.release.x86_64 = "res://addons/nostr_godot/gdextension/lib/nostr_crypto.dll"
+macos.debug = "res://addons/nostr_godot/gdextension/lib/libnostr_crypto.dylib"
+macos.release = "res://addons/nostr_godot/gdextension/lib/libnostr_crypto.dylib"

@@ -13,12 +13,17 @@ config_version=5
 config/name="GDNostr"
 config/version="0.0.1"
 run/main_scene="uid://sgxtwctfjqqt"
-config/features=PackedStringArray("4.6", "C#", "GL Compatibility")
+config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
-NostrGD="*uid://b3e3cycfxgjq7"
+NostrGD="*uid://b2kfiyir2ccuw"
+
+[display]
+
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [dotnet]
 
@@ -37,3 +42,8 @@ enabled=PackedStringArray("res://addons/nostr_godot/plugin.cfg")
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
+
+[web]
+
+canvas/export/embed_icon_in_html=true

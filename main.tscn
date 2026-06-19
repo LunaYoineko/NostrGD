@@ -2,6 +2,17 @@
 
 [ext_resource type="Script" uid="uid://bvhvihrk1ov0p" path="res://main.gd" id="1_wj02o"]
 
+[sub_resource type="StyleBoxFlat" id="2"]
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+bg_color = Color(0.15, 0.16, 0.19, 0.95)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [node name="Control" type="Control" unique_id=2109930511]
 layout_mode = 3
 anchors_preset = 15
@@ -20,11 +31,107 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.07, 0.08, 0.09, 1)
 
+[node name="MainPanel" type="VBoxContainer" parent="." unique_id=1772484735]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="SectionHeader" type="PanelContainer" parent="MainPanel" unique_id=445300601]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+
+[node name="HeaderHBox" type="HBoxContainer" parent="MainPanel/SectionHeader" unique_id=2101891112]
+layout_mode = 2
+
+[node name="HamburgerBtn" type="Button" parent="MainPanel/SectionHeader/HeaderHBox" unique_id=1383999359]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+text = "☰"
+
+[node name="HeaderLabel" type="Label" parent="MainPanel/SectionHeader/HeaderHBox" unique_id=596581300]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.5, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "  タイムライン"
+vertical_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainPanel" unique_id=481595205]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Timeline" type="VBoxContainer" parent="MainPanel/ScrollContainer" unique_id=2036629723]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="NotificationsPanel" type="VBoxContainer" parent="MainPanel" unique_id=600896925]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="DMPanel" type="VBoxContainer" parent="MainPanel" unique_id=6065351]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="BookmarksPanel" type="VBoxContainer" parent="MainPanel" unique_id=6065352]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="ProfilePanel" type="VBoxContainer" parent="MainPanel" unique_id=498260078]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="SettingsPanel" type="VBoxContainer" parent="MainPanel" unique_id=1628920022]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="InputBar" type="PanelContainer" parent="MainPanel" unique_id=1856516540]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MainPanel/InputBar" unique_id=482595701]
+layout_mode = 2
+
+[node name="MessageInput" type="LineEdit" parent="MainPanel/InputBar/HBoxContainer" unique_id=126963061]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "テキストを入力..."
+
+[node name="SendButton" type="Button" parent="MainPanel/InputBar/HBoxContainer" unique_id=1644481098]
+custom_minimum_size = Vector2(80, 44)
+layout_mode = 2
+text = "送信"
+
+[node name="DrawerBg" type="ColorRect" parent="." unique_id=70739929]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0.4)
+
 [node name="Sidebar" type="PanelContainer" parent="." unique_id=1625856421]
 layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
-offset_right = 340.0
+offset_right = 280.0
 grow_horizontal = 0
 grow_vertical = 2
 
@@ -36,12 +143,21 @@ theme_override_constants/separation = 0
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="Sidebar/SidebarInner/SidebarTitle" unique_id=758026182]
+[node name="TitleHBox" type="HBoxContainer" parent="Sidebar/SidebarInner/SidebarTitle" unique_id=555752772]
 layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Sidebar/SidebarInner/SidebarTitle/TitleHBox" unique_id=758026182]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.4, 0.7, 1, 1)
 theme_override_font_sizes/font_size = 18
-text = "  NostrGD"
+text = "NostrGD"
 vertical_alignment = 1
+
+[node name="CloseBtn" type="Button" parent="Sidebar/SidebarInner/SidebarTitle/TitleHBox" unique_id=1931985852]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+text = "✕"
 
 [node name="AccountSection" type="PanelContainer" parent="Sidebar/SidebarInner" unique_id=1150329617]
 layout_mode = 2
@@ -60,13 +176,13 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="LoginChoiceBtn" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/AuthChoiceHBox" unique_id=1371957225]
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "🔑 ログイン"
 
 [node name="CreateChoiceBtn" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/AuthChoiceHBox" unique_id=637136485]
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "🆕 新規作成"
@@ -83,7 +199,7 @@ theme_override_colors/background_color = Color(0.12, 0.13, 0.16, 1)
 placeholder_text = "nsec1... または hex 秘密鍵"
 
 [node name="LoginConfirmBtn" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/LoginContainer" unique_id=1933704109]
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "ログイン"
 
@@ -121,13 +237,13 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="CreateConfirmBtn" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/CreateContainer/CreateBtnHBox" unique_id=684318272]
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "作成"
 
 [node name="CreateBackBtn" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/CreateContainer/CreateBtnHBox" unique_id=563533549]
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 2
 text = "戻る"
@@ -137,7 +253,7 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="DisconnectButton" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/LoggedInContainer" unique_id=2136062688]
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "切断"
 
@@ -145,7 +261,7 @@ text = "切断"
 layout_mode = 2
 
 [node name="ExtensionLogin" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer" unique_id=1480464038]
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "ブラウザ拡張 (NIP-07) でログイン"
 
@@ -157,31 +273,37 @@ layout_mode = 2
 theme_override_constants/separation = 0
 
 [node name="NavTimeline" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=106653480]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "🌐  タイムライン"
 alignment = 0
 
 [node name="NavNotifications" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=279522241]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "🔔  通知"
 alignment = 0
 
 [node name="NavDM" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=1711656785]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "💬  DM"
 alignment = 0
 
+[node name="NavBookmarks" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=1423081827]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "🔖  ブックマーク"
+alignment = 0
+
 [node name="NavProfile" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=1534435018]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "👤  プロフィール"
 alignment = 0
 
 [node name="NavSettings" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=1423081826]
-custom_minimum_size = Vector2(0, 38)
+custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "⚙️  設定"
 alignment = 0
@@ -197,78 +319,32 @@ theme_override_colors/font_color = Color(0.6, 0.65, 0.7, 1)
 text = "未ログイン"
 autowrap_mode = 3
 
-[node name="MainPanel" type="VBoxContainer" parent="." unique_id=1772484735]
+[node name="Snackbar" type="PanelContainer" parent="." unique_id=-1381143947]
+visible = false
 layout_mode = 1
-anchors_preset = 11
-anchor_left = 1.0
-anchor_right = 1.0
+anchors_preset = -1
+anchor_left = 0.25
+anchor_top = 1.0
+anchor_right = 0.75
 anchor_bottom = 1.0
-offset_left = -660.0
-grow_horizontal = 0
+offset_top = -60.0
+grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("2")
 
-[node name="SectionHeader" type="PanelContainer" parent="MainPanel" unique_id=445300601]
-custom_minimum_size = Vector2(0, 42)
-layout_mode = 2
-
-[node name="HeaderLabel" type="Label" parent="MainPanel/SectionHeader" unique_id=596581300]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.5, 0.7, 1, 1)
-theme_override_font_sizes/font_size = 14
-text = "  タイムライン"
-vertical_alignment = 1
-
-[node name="ScrollContainer" type="ScrollContainer" parent="MainPanel" unique_id=481595205]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="Timeline" type="VBoxContainer" parent="MainPanel/ScrollContainer" unique_id=2036629723]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="NotificationsPanel" type="VBoxContainer" parent="MainPanel" unique_id=600896925]
-visible = false
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 8
-
-[node name="DMPanel" type="VBoxContainer" parent="MainPanel" unique_id=6065351]
-visible = false
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 8
-
-[node name="ProfilePanel" type="VBoxContainer" parent="MainPanel" unique_id=498260078]
-visible = false
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 8
-
-[node name="SettingsPanel" type="VBoxContainer" parent="MainPanel" unique_id=1628920022]
-visible = false
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 8
-
-[node name="InputBar" type="PanelContainer" parent="MainPanel" unique_id=1856516540]
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="MainPanel/InputBar" unique_id=482595701]
-layout_mode = 2
-
-[node name="MessageInput" type="LineEdit" parent="MainPanel/InputBar/HBoxContainer" unique_id=126963061]
-custom_minimum_size = Vector2(0, 36)
+[node name="SnackbarLabel" type="Label" parent="Snackbar" unique_id=112208631]
 layout_mode = 2
 size_flags_horizontal = 3
-placeholder_text = "テキストを入力..."
+theme_override_colors/font_color = Color(0.9, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
-[node name="SendButton" type="Button" parent="MainPanel/InputBar/HBoxContainer" unique_id=1644481098]
-custom_minimum_size = Vector2(80, 36)
-layout_mode = 2
-text = "送信"
-
+[connection signal="pressed" from="MainPanel/SectionHeader/HeaderHBox/HamburgerBtn" to="." method="_on_hamburger_pressed"]
+[connection signal="pressed" from="MainPanel/InputBar/HBoxContainer/SendButton" to="." method="_on_send_button_pressed"]
+[connection signal="pressed" from="Sidebar/SidebarInner/SidebarTitle/TitleHBox/CloseBtn" to="." method="_on_sidebar_close_pressed"]
 [connection signal="pressed" from="Sidebar/SidebarInner/AccountSection/VBoxContainer/AuthChoiceHBox/LoginChoiceBtn" to="." method="_on_show_login_form"]
 [connection signal="pressed" from="Sidebar/SidebarInner/AccountSection/VBoxContainer/AuthChoiceHBox/CreateChoiceBtn" to="." method="_on_show_create_form"]
 [connection signal="pressed" from="Sidebar/SidebarInner/AccountSection/VBoxContainer/LoginContainer/LoginConfirmBtn" to="." method="_on_login_button_pressed"]
@@ -281,4 +357,4 @@ text = "送信"
 [connection signal="pressed" from="Sidebar/SidebarInner/NavSection/NavMenu/NavDM" to="." method="_on_nav_dm"]
 [connection signal="pressed" from="Sidebar/SidebarInner/NavSection/NavMenu/NavProfile" to="." method="_on_nav_profile"]
 [connection signal="pressed" from="Sidebar/SidebarInner/NavSection/NavMenu/NavSettings" to="." method="_on_nav_settings"]
-[connection signal="pressed" from="MainPanel/InputBar/HBoxContainer/SendButton" to="." method="_on_send_button_pressed"]
+[connection signal="pressed" from="Sidebar/SidebarInner/NavSection/NavMenu/NavBookmarks" to="." method="_on_nav_bookmarks"]
