@@ -218,12 +218,18 @@ func _ready() -> void:
 
 	_connect_relays()
 
+const NotoSansJP := preload("res://fonts/NotoSansJP.ttf")
+
 func _apply_theme() -> void:
-	var font_path := "res://fonts/NotoSansJP.ttf"
-	if ResourceLoader.exists(font_path):
-		var font := ResourceLoader.load(font_path)
-		if font is Font:
-			ThemeDB.fallback_font = font
+	var system_font := SystemFont.new()
+	system_font.font_names = [
+		"Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+		"Yu Gothic", "Yu Gothic UI", "Meiryo",
+		"MS PGothic", "sans-serif"
+	]
+	if NotoSansJP is Font:
+		system_font.fallbacks = [NotoSansJP]
+	ThemeDB.fallback_font = system_font
 	var window_bg = StyleBoxFlat.new()
 	window_bg.bg_color = Color(0.09, 0.1, 0.12)
 
