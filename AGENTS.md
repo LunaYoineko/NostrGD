@@ -68,12 +68,23 @@
 
 - 純 GDScript → `.NET 不要`、Godot 標準 Web エクスポートがそのまま使える
 - `nostr_gd_client.gd` は `OS.has_feature("web")` で分岐:
-  - Desktop: `TCPServer` + raw HTTP/1.1 (localhost:8123) + ブラウザ自動起動（pubkey 取得のみ、署名未対応）
-  - Web: `JavaScriptBridge.eval()` 経由で直接 `window.nostr` を呼び出し（pubkey 取得のみ、署名未対応）
-- 署名フロー: 未実装（`_sign_with_extension` は `_signature_pending` ポーリングダミー。拡張ユーザーは読取専用）
+  - Desktop: `TCPServer` + raw HTTP/1.1 (localhost:8123) + ブラウザ自動起動（NIP-07 pubkey 取得）
+  - Web: `JavaScriptBridge.eval()` 経由で直接 `window.nostr` を呼び出し
+- NIP-07 署名フロー（Web のみ）:
+  - `_sign_and_broadcast` が拡張ログイン ＋ Web を検出すると `_initiate_web_sign` を呼ぶ
+  - JS 側で `window.nostr.signEvent()` → `_poll_web_sign` が結果をポーリング
+  - 署名が届いたら `_broadcast_or_queue` ＋ `_process_event_for_timeline` を実行
 - `export_presets.cfg` に Web プリセット設定済み
 - `project.godot` に `[web]` セクション追加済み
-- GDScript の `DisplayServer.clipboard_set` は `_safe_clipboard_set` でラップし Web ではスキップ
+- `DisplayServer.clipboard_set` は `_safe_clipboard_set` でラップし Web では `navigator.clipboard.writeText()` を使用
+- `OS.shell_open()` は `_open_url()` でラップし Web では `window.open()` を使用
+- **モバイル（<800px viewport）:**
+  - サイドバー代わりに `_setup_mobile_bottom_nav()` で下部タブバー（アイコン6個）を生成
+  - `_bottom_nav`: `PanelContainer`（背景 `#1c1e24`、角丸8px上部、anchor-bottom固定）
+  - InputBar はタイムラインセクションのみ表示（`_switch_section`, `_set_ui_state` で制御）
+  - `_update_bottom_nav_highlight()`: 現在のセクションのアイコンを `#66b3ff` に、他を `#808099` に
+  - `_on_bottom_nav_pressed`: セクション切り替え、サイドバーが開いていれば閉じる
+  - `_on_viewport_resized`: 800px 境界で mobile ↔ desktop 切替時に bottom_nav の生成/破棄
 
 ### 暗号（secp256k1.gd）
 

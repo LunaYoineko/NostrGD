@@ -64,9 +64,10 @@ var profile_cache: Dictionary = {}
 var pending_labels: Dictionary = {}
 var pubkey_request_pool: Array[String] = []
 var pool_timer: Timer
+var _profile_request_active: bool = false
+var _profile_request_time: int = 0
 var _timeline_update_timer: Timer
 var _notif_refresh_timer: Timer
-var _profile_request_active: bool = false
 var _pending_sorted_timeline: Array = []
 var _pending_profile_events: Array[Dictionary] = []
 var _relays_timeline_subscribed: Dictionary = {}
@@ -120,10 +121,13 @@ var _bookmark_content_sub_id: String = ""
 var _bookmark_loaded_event_ids: Dictionary = {}
 var _sidebar_visible: bool = true
 var _is_mobile: bool = false
+var _bottom_nav: PanelContainer = null
+var _bottom_nav_buttons: Array[Button] = []
 var _relays_notif_subscribed: Dictionary = {}
 var _relays_dm_subscribed: Dictionary = {}
 const SIDEBAR_WIDTH: int = 280
 const DESKTOP_BREAKPOINT: int = 800
+const BOTTOM_NAV_HEIGHT: int = 56
 const BTN_MQ: int = 38
 const BTN_MQ_TALL: int = 44
 var _touch_start_x: float = -1.0
@@ -151,6 +155,8 @@ func _ready() -> void:
 	_setup_zap_popup()
 	_setup_invoice_popup()
 	_setup_responsive_layout()
+	if _is_mobile:
+		_setup_mobile_bottom_nav()
 
 	$MainPanel/ScrollContainer.clip_contents = true
 	$MainPanel/ScrollContainer/Timeline.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -239,6 +245,17 @@ func _ready() -> void:
 	if saved_relays.size() > 0:
 		for url in saved_relays:
 			RELAY_URL.append(url)
+	else:
+		var default_relays = [
+			"wss://relay-jp.nostr.wirednet.jp/",
+			"wss://nrelay-jp.nostr.wirednet.jp/",
+			"wss://yabu.me/",
+			"wss://nos.lol/",
+			"wss://relay.nostr.band/",
+		]
+		for url in default_relays:
+			RELAY_URL.append(url)
+		NostrGD.SaveRelayUrls(default_relays)
 
 	var saved_key = _load_private_key()
 	if not saved_key.is_empty():
@@ -257,6 +274,9 @@ func _ready() -> void:
 	_build_sections()
 	_switch_section(Section.TIMELINE)
 	_load_bookmarks()
+	if NostrGD.IsLoggedIn:
+		_update_settings_nsec_field()
+		_refresh_profile()
 
 	_connect_relays()
 
@@ -434,8 +454,64 @@ func _setup_responsive_layout() -> void:
 	)
 	get_tree().root.size_changed.connect(_on_viewport_resized)
 
+func _setup_mobile_bottom_nav() -> void:
+	if _bottom_nav != null:
+		_bottom_nav.queue_free()
+		_bottom_nav_buttons.clear()
+	_bottom_nav = PanelContainer.new()
+	_bottom_nav.name = "BottomNav"
+	_bottom_nav.anchor_right = 1.0
+	_bottom_nav.anchor_bottom = 1.0
+	_bottom_nav.offset_top = -BOTTOM_NAV_HEIGHT
+	_bottom_nav.offset_bottom = 0
+	_bottom_nav.mouse_filter = Control.MOUSE_FILTER_STOP
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = Color(0.11, 0.12, 0.14)
+	bg.corner_radius_top_left = 8
+	bg.corner_radius_top_right = 8
+	_bottom_nav.add_theme_stylebox_override("panel", bg)
+	var hbox := HBoxContainer.new()
+	hbox.anchor_right = 1.0
+	hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	_bottom_nav.add_child(hbox)
+	var icon_names := ["house", "bell", "message-square", "user", "bookmark", "settings"]
+	for i in icon_names.size():
+		var btn := Button.new()
+		btn.flat = true
+		btn.icon = _get_icon(icon_names[i], 20)
+		btn.tooltip_text = ["タイムライン", "通知", "DM", "プロフィール", "ブックマーク", "設定"][i]
+		btn.custom_minimum_size = Vector2(0, BOTTOM_NAV_HEIGHT)
+		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		btn.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		var section_index = [Section.TIMELINE, Section.NOTIFICATIONS, Section.DM, Section.PROFILE, Section.BOOKMARKS, Section.SETTINGS][i]
+		btn.pressed.connect(_on_bottom_nav_pressed.bind(section_index))
+		hbox.add_child(btn)
+		_bottom_nav_buttons.append(btn)
+	_update_bottom_nav_highlight()
+	add_child(_bottom_nav)
+
+func _update_bottom_nav_highlight() -> void:
+	if _bottom_nav_buttons.is_empty():
+		return
+	for i in _bottom_nav_buttons.size():
+		var btn = _bottom_nav_buttons[i]
+		var section_map := [Section.TIMELINE, Section.NOTIFICATIONS, Section.DM, Section.PROFILE, Section.BOOKMARKS, Section.SETTINGS]
+		var idx = section_map.find(_current_section)
+		if i == idx:
+			btn.add_theme_color_override("icon_normal_color", Color(0.4, 0.7, 1.0))
+		else:
+			btn.add_theme_color_override("icon_normal_color", Color(0.5, 0.5, 0.6))
+
+func _on_bottom_nav_pressed(section: int) -> void:
+	if _is_mobile and _sidebar_visible:
+		_sidebar_visible = false
+		_update_sidebar_state()
+	_switch_section(section)
+
 func _on_viewport_resized() -> void:
 	var vp_w = get_viewport().size.x
+	var was_mobile = _is_mobile
 	_is_mobile = vp_w < DESKTOP_BREAKPOINT
 	if _is_mobile and _sidebar_visible:
 		_sidebar_visible = false
@@ -443,6 +519,16 @@ func _on_viewport_resized() -> void:
 	elif not _is_mobile and not _sidebar_visible:
 		_sidebar_visible = true
 		_update_sidebar_state()
+	if _is_mobile and not was_mobile:
+		_setup_mobile_bottom_nav()
+		if _ui_state == UIState.LOGGED_IN:
+			$MainPanel/InputBar.visible = (_current_section == Section.TIMELINE)
+	elif not _is_mobile and was_mobile:
+		if _bottom_nav != null:
+			_bottom_nav.queue_free()
+			_bottom_nav = null
+			_bottom_nav_buttons.clear()
+		$MainPanel/InputBar.visible = (_ui_state == UIState.LOGGED_IN and _current_section == Section.TIMELINE)
 
 func _on_hamburger_pressed() -> void:
 	_sidebar_visible = not _sidebar_visible
@@ -462,7 +548,15 @@ func _update_sidebar_state() -> void:
 		sidebar.offset_left = 0
 		sidebar.offset_right = SIDEBAR_WIDTH
 		main_panel.offset_left = 0
+		main_panel.offset_bottom = 0
+		if _bottom_nav != null:
+			_bottom_nav.visible = true
+			_bottom_nav.offset_left = 0
+			_bottom_nav.offset_right = 0
 	else:
+		if _bottom_nav != null:
+			_bottom_nav.visible = false
+		main_panel.offset_bottom = 0
 		if _sidebar_visible:
 			sidebar.offset_left = 0
 			sidebar.offset_right = SIDEBAR_WIDTH
@@ -478,7 +572,10 @@ func _set_ui_state(state: int) -> void:
 	login_container.visible = (state == UIState.LOGIN_FORM)
 	create_container.visible = (state == UIState.CREATE_FORM)
 	logged_in_container.visible = (state == UIState.LOGGED_IN)
-	$MainPanel/InputBar.visible = (state == UIState.LOGGED_IN)
+	if _is_mobile:
+		$MainPanel/InputBar.visible = (state == UIState.LOGGED_IN and _current_section == Section.TIMELINE)
+	else:
+		$MainPanel/InputBar.visible = (state == UIState.LOGGED_IN)
 	$Sidebar/SidebarInner/AccountSection/VBoxContainer/ExtensionLogin.visible = (state != UIState.LOGGED_IN)
 
 	if state == UIState.LOGGED_IN:
@@ -958,7 +1055,8 @@ func _switch_section(section: int) -> void:
 	match section:
 		Section.TIMELINE:
 			$MainPanel/ScrollContainer.show()
-			$MainPanel/InputBar.visible = (_ui_state == UIState.LOGGED_IN)
+			if not _is_mobile:
+				$MainPanel/InputBar.visible = (_ui_state == UIState.LOGGED_IN)
 		Section.NOTIFICATIONS:
 			$MainPanel/NotificationsPanel.show()
 			$MainPanel/InputBar.hide()
@@ -980,6 +1078,13 @@ func _switch_section(section: int) -> void:
 			_refresh_bookmarks()
 
 	_update_nav_highlight()
+	_update_bottom_nav_highlight()
+
+	if _is_mobile:
+		if section == Section.TIMELINE and _ui_state == UIState.LOGGED_IN:
+			$MainPanel/InputBar.visible = true
+		else:
+			$MainPanel/InputBar.visible = false
 
 func _refresh_profile() -> void:
 	var panel = $MainPanel/ProfilePanel
@@ -1079,6 +1184,8 @@ func _refresh_profile() -> void:
 		pubkey_label.text = "Pubkey: " + pubkey
 		if not pubkey_request_pool.has(pubkey):
 			pubkey_request_pool.append(pubkey)
+		if not pool_timer.is_processing():
+			pool_timer.start()
 		return
 
 	name_label.text = profile.get("display_name", profile.get("name", "Unknown"))
@@ -1314,6 +1421,7 @@ func _on_nostr_event_received(subscription_id: String, event_dict: Dictionary) -
 	match subscription_id:
 		"profile_resolver":
 			_profile_request_active = false
+			_profile_request_time = 0
 			_parse_profile_event(event_dict)
 		_:
 			if event_dict.has("kind") and event_dict["kind"] == 0:
@@ -1736,6 +1844,16 @@ func _on_create_account_button_pressed() -> void:
 
 		_connect_relays()
 		_set_ui_state(UIState.LOGGED_IN)
+		_update_settings_nsec_field()
+
+		profile_cache[NostrGD.GetPublicKeyHex()] = {
+			"name": user_name,
+			"display_name": display_name,
+			"picture": register_picture_input.text.strip_edges(),
+			"banner": register_banner_input.text.strip_edges(),
+			"lud16": register_lud16_input.text.strip_edges()
+		}
+		_refresh_profile()
 
 		NostrGD.SendProfileMetaData(
 			user_name,
@@ -1745,14 +1863,6 @@ func _on_create_account_button_pressed() -> void:
 			register_banner_input.text.strip_edges(),
 			register_lud16_input.text.strip_edges()
 		)
-
-		profile_cache[NostrGD.GetPublicKeyHex()] = {
-			"name": user_name,
-			"display_name": display_name,
-			"picture": register_picture_input.text.strip_edges(),
-			"banner": register_banner_input.text.strip_edges(),
-			"lud16": register_lud16_input.text.strip_edges()
-		}
 
 		if not pool_timer.is_processing():
 			pool_timer.start()
@@ -1769,7 +1879,8 @@ func _on_login_button_pressed() -> void:
 		_save_private_key(key_input_text)
 		_connect_relays()
 		_set_ui_state(UIState.LOGGED_IN)
-		status_label.text = "ログイン完了"
+		_update_settings_nsec_field()
+		_refresh_profile()
 	else:
 		status_label.text = "エラー: 無効な秘密鍵(Hexまたはnsec)です"
 
@@ -2366,7 +2477,10 @@ func _on_image_file_selected(path: String) -> void:
 						current_text += "\n"
 					message_input.text = current_text + url
 					status_label.text = "画像URLを挿入しました"
-					return
+		return
+
+	if not pool_timer.is_processing():
+		pool_timer.start()
 			status_label.text = "URLが取得できませんでした。手動でURLを貼ってください。"
 		else:
 			status_label.text = "アップロード失敗(" + str(response_code) + ")。手動で画像URLを貼ってください。"
@@ -2756,7 +2870,7 @@ func _rebuild_timeline_item(event: Dictionary) -> void:
 			tag_btn.add_theme_color_override("font_color", Color(0.4, 0.6, 1.0))
 			tag_btn.add_theme_font_size_override("font_size", 11)
 			var tag_url = "https://nostr.band/?q=" + tag.trim_prefix("#").uri_encode()
-			tag_btn.pressed.connect(func(): OS.shell_open(tag_url))
+			tag_btn.pressed.connect(func(): _open_url(tag_url))
 			tag_hbox.add_child(tag_btn)
 
 	var note_id_from_content: String = ""
@@ -2834,7 +2948,7 @@ func _rebuild_timeline_item(event: Dictionary) -> void:
 			nested_vbox.add_child(url_label)
 			var open_btn = Button.new()
 			open_btn.text = "ブラウザで開く"
-			open_btn.pressed.connect(func(): OS.shell_open(npub_url))
+			open_btn.pressed.connect(func(): _open_url(npub_url))
 			nested_vbox.add_child(open_btn)
 		elif note_id_from_content != "":
 			var loading_label = Label.new()
@@ -2874,7 +2988,7 @@ func _rebuild_timeline_item(event: Dictionary) -> void:
 		link_btn.text = link
 		link_btn.underline = LinkButton.UNDERLINE_MODE_ON_HOVER
 		link_btn.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		link_btn.pressed.connect(func(): OS.shell_open(link))
+		link_btn.pressed.connect(func(): _open_url(link))
 		right_vbox.add_child(link_btn)
 
 func _load_and_display_image(url: String, parent_node: Node) -> void:
@@ -3040,13 +3154,18 @@ func _load_and_apply_banner(url: String, target_rect: TextureRect) -> void:
 
 func _on_pool_timer_timeout() -> void:
 	if _profile_request_active:
-		return
+		var elapsed = Time.get_ticks_msec() - _profile_request_time
+		if _profile_request_time > 0 and elapsed < 15000:
+			return
+		_profile_request_active = false
 
 	if pubkey_request_pool.is_empty():
 		_profile_request_active = false
+		_profile_request_time = 0
 		return
 
 	_profile_request_active = true
+	_profile_request_time = Time.get_ticks_msec()
 	var pool_copy = pubkey_request_pool.duplicate()
 	pubkey_request_pool.clear()
 
@@ -3123,8 +3242,24 @@ func _copy_account_pubkey() -> void:
 	status_label.text = "npub をコピーしました"
 
 func _safe_clipboard_set(text: String) -> void:
-	if not OS.has_feature("web"):
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("navigator.clipboard.writeText('" + text.replace("\\", "\\\\").replace("'", "\\'") + "').catch(function(e) {})")
+	else:
 		DisplayServer.clipboard_set(text)
+
+func _open_url(url: String) -> void:
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.open('" + url.replace("\\", "\\\\").replace("'", "\\'") + "','_blank')")
+	else:
+		OS.shell_open(url)
+
+func _update_settings_nsec_field() -> void:
+	var panel = $MainPanel/SettingsPanel
+	if panel == null:
+		return
+	var nsec_input = panel.get_node_or_null("SettingsNsecInput") as LineEdit
+	if nsec_input != null and NostrGD.IsLoggedIn:
+		nsec_input.text = NostrGD.GetPrivateKeyNsec()
 
 var _snackbar_timer: Timer = null
 
@@ -3171,10 +3306,10 @@ func _render_youtube_embed(video_id: String, parent: Node) -> void:
 	var yt_width = _get_media_max_width()
 	var yt_height = yt_width * 9 / 16
 	var play_btn = Button.new()
-	play_btn.text = "▶ " + video_id
+	play_btn.text = video_id
 	play_btn.custom_minimum_size = Vector2(yt_width, 40)
 	play_btn.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	play_btn.pressed.connect(func(): OS.shell_open(yt_url))
+	play_btn.pressed.connect(func(): _open_url(yt_url))
 	yt_vbox.add_child(play_btn)
 
 	var thumb_rect = TextureRect.new()
@@ -3187,7 +3322,7 @@ func _render_youtube_embed(video_id: String, parent: Node) -> void:
 
 	thumb_rect.gui_input.connect(func(event: InputEvent):
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			OS.shell_open(yt_url)
+			_open_url(yt_url)
 	)
 
 	_load_youtube_thumbnail(thumb_url, thumb_rect)
