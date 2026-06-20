@@ -219,28 +219,6 @@ func _ready() -> void:
 	_connect_relays()
 
 func _apply_theme() -> void:
-	var font_path := "res://fonts/NotoSansJP.ttf"
-	if ResourceLoader.exists(font_path):
-		var jp_font := ResourceLoader.load(font_path)
-		if jp_font is Font:
-			var default_theme := ThemeDB.fallback_theme
-			if default_theme:
-				var default_font := default_theme.get_font("font", "Label") as Font
-				if default_font:
-					jp_font.fallbacks = [default_font]
-			ThemeDB.fallback_font = jp_font
-			var theme := Theme.new()
-			var types := [
-				"Label", "Button", "LineEdit", "TextEdit", "RichTextLabel",
-				"Window", "Panel", "PanelContainer", "ScrollContainer",
-				"VBoxContainer", "HBoxContainer", "OptionButton",
-				"CheckBox", "CheckButton", "TabBar", "TabContainer",
-				"PopupMenu", "PopupPanel", "AcceptDialog", "ItemList",
-				"Tree", "MenuButton", "HSlider", "VSlider", "ProgressBar"
-			]
-			for t in types:
-				theme.set_font("font", t, jp_font)
-			self.theme = theme
 	var window_bg = StyleBoxFlat.new()
 	window_bg.bg_color = Color(0.09, 0.1, 0.12)
 
@@ -930,7 +908,7 @@ func _switch_section(section: int) -> void:
 		Section.DM: "💬  DM",
 		Section.PROFILE: "👤  プロフィール",
 		Section.SETTINGS: "⚙️  設定",
-		Section.BOOKMARKS: "🔖  ブックマーク"
+		Section.BOOKMARKS: "□ ブックマーク"
 	}
 	section_header.text = names.get(section, "セクション")
 
@@ -2097,7 +2075,7 @@ func _refresh_bookmarks() -> void:
 		child.queue_free()
 	if _bookmarked_events.is_empty():
 		var empty_label = Label.new()
-		empty_label.text = "ブックマークはありません\nイベントの 🔖 ボタンで追加"
+		empty_label.text = "ブックマークはありません\nイベントのブックマークボタンで追加"
 		empty_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
 		empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		empty_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -2176,7 +2154,7 @@ func _render_bookmark_card(event: Dictionary) -> PanelContainer:
 	vbox.add_child(btn_hbox)
 
 	var remove_btn = Button.new()
-	remove_btn.text = "🔖 削除"
+	remove_btn.text = "削除"
 	remove_btn.add_theme_color_override("font_color", Color(1, 0.4, 0.4))
 	remove_btn.add_theme_font_size_override("font_size", 10)
 	remove_btn.pressed.connect(_remove_bookmark.bind(event_id))

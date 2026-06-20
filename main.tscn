@@ -179,13 +179,13 @@ theme_override_constants/separation = 6
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
-text = "🔑 ログイン"
+text = "ログイン"
 
 [node name="CreateChoiceBtn" type="Button" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer/AuthChoiceHBox" unique_id=637136485]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
-text = "🆕 新規作成"
+text = "新規作成"
 
 [node name="LoginContainer" type="VBoxContainer" parent="Sidebar/SidebarInner/AccountSection/VBoxContainer" unique_id=1892887989]
 layout_mode = 2
@@ -275,37 +275,37 @@ theme_override_constants/separation = 0
 [node name="NavTimeline" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=106653480]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
-text = "🌐  タイムライン"
+text = "  タイムライン"
 alignment = 0
 
 [node name="NavNotifications" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=279522241]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
-text = "🔔  通知"
+text = "  通知"
 alignment = 0
 
 [node name="NavDM" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=1711656785]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
-text = "💬  DM"
+text = "  DM"
 alignment = 0
 
 [node name="NavBookmarks" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=1423081827]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
-text = "🔖  ブックマーク"
+text = "  ブックマーク"
 alignment = 0
 
 [node name="NavProfile" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=1534435018]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
-text = "👤  プロフィール"
+text = "  プロフィール"
 alignment = 0
 
 [node name="NavSettings" type="Button" parent="Sidebar/SidebarInner/NavSection/NavMenu" unique_id=1423081826]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
-text = "⚙️  設定"
+text = "  設定"
 alignment = 0
 
 [node name="StatusSection" type="PanelContainer" parent="Sidebar/SidebarInner" unique_id=1173963993]

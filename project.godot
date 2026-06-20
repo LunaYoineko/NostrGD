@@ -33,6 +33,10 @@ project/assembly_name="GDNostr"
 
 enabled=PackedStringArray("res://addons/nostr_godot/plugin.cfg")
 
+[gui]
+
+theme/custom_font="res://fonts/composite_font.tres"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
