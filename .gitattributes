@@ -1,2 +1,28 @@
 # Normalize EOL for all files that Git considers text files.
 * text=auto eol=lf
+
+# Godot Asset Library export — only addons/nostr_godot/ is the plugin
+/project.godot        export-ignore
+/main.gd              export-ignore
+/main.gd.uid          export-ignore
+/main.tscn            export-ignore
+/AGENTS.md            export-ignore
+/README.md            export-ignore
+/README_EN.md         export-ignore
+/LICENSE              export-ignore
+/LICENSE.md           export-ignore
+/.editorconfig        export-ignore
+/.gitignore           export-ignore
+/.gitmodules          export-ignore
+/icon.svg             export-ignore
+/icon.svg.import      export-ignore
+/export_presets.cfg   export-ignore
+/debug.keystore       export-ignore
+/release.keystore     export-ignore
+/android/             export-ignore
+/build/               export-ignore
+/docs/                export-ignore
+/fonts/               export-ignore
+/icons/               export-ignore
+/reference/           export-ignore
+/scripts/             export-ignore

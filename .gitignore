@@ -21,3 +21,5 @@ addons/nostr_godot/gdextension/lib/*.so
 addons/nostr_godot/gdextension/lib/*.dll
 addons/nostr_godot/gdextension/lib/*.dylib
 
+fonts/
+icons/
