@@ -105,6 +105,27 @@
 - bech32: `npub_encode`/`npub_decode`/`nsec_encode`/`nsec_decode`（Bech32、NIP-19）
 - 曲線定数: `_ensure_init` で初回アクセス時に静的初期化
 
+### GDExtension ビルド
+
+- `addons/nostr_godot/gdextension/build.sh -p <platform> -a <arch> [-t debug|release]` でクロスプラットフォームビルド
+- 対応プラットフォーム: `linux`, `windows`, `macos`, `web`, `android`
+- 対応アーキテクチャ: `x86_64`, `arm64`, `wasm32`
+- 例: `./build.sh -p web -a wasm32`（Emscripten 必須、事前に `source ~/emsdk/emsdk_env.sh`）, `./build.sh -p windows -a x86_64`（MinGW 必須）
+- 各プラットフォームのライブラリは `lib/` に配置され、`nostr_crypto.gdextension` が自動選択（18エントリ）
+- `libsecp256k1/` と `godot-cpp/` は git 管理外（各自ビルド or 事前ビルド済みバイナリ）
+- **既知の問題:**
+  - godot-cpp の SCons は CC/CXX 環境変数を無視するため、クロスコンパイル時は SConstruct を一時的にパッチ（`env.Replace(CC=...)`）する。`build.sh` 内で自動的に行われる。
+  - Windows/MinGW ビルド時は `-DSECP256K1_STATIC` が必要（`__declspec(dllimport)` 回避のため）。`build.sh` 内で自動的に追加される。
+  - cmake の `CMAKE_AR` に相対パスで `emar` 等を渡すと `libsecp256k1/emar` に解決されるため、`$(which emar)` のフルパスを使用する。
+- 2026年6月時点で以下のテンプレートをビルド・配置済み:
+  - Linux x86_64 (debug + release)
+  - Linux ARM64 (debug + release)
+  - Windows x86_64 (debug + release)
+  - Web Wasm32 (debug + release)
+- macOS/Android は未ビルド（Android NDK 未設定、macOS ビルドは macOS ホストが必要）
+- Web エクスポート時は `export_presets.cfg` の `variant/extensions_support=true` が必要（設定済み）
+- フォールバック: GDExtension が利用できない環境では純 GDScript `secp256k1.gd` が自動的に使用される
+
 ### Git
 
 - リモート: `https://github.com/Luna1029-VRChat/NostrGD.git`

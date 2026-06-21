@@ -20,6 +20,7 @@ addons/nostr_godot/gdextension/gdextension_interface.h
 addons/nostr_godot/gdextension/lib/*.so
 addons/nostr_godot/gdextension/lib/*.dll
 addons/nostr_godot/gdextension/lib/*.dylib
+addons/nostr_godot/gdextension/lib/*.wasm
 
 fonts/
 icons/

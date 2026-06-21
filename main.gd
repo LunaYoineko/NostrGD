@@ -100,6 +100,7 @@ var _invoice_label: Label
 var _invoice_qr_rect: TextureRect
 var _notifications_events: Array = []
 var _dm_conversations: Dictionary = {}
+var _dm_selected_sender: String = ""
 var _reply_context: Dictionary = {}
 var _reaction_counts: Dictionary = {}
 var _stamp_counts: Dictionary = {}
@@ -548,7 +549,7 @@ func _update_sidebar_state() -> void:
 		sidebar.offset_left = 0
 		sidebar.offset_right = SIDEBAR_WIDTH
 		main_panel.offset_left = 0
-		main_panel.offset_bottom = 0
+		main_panel.offset_bottom = BOTTOM_NAV_HEIGHT
 		if _bottom_nav != null:
 			_bottom_nav.visible = true
 			_bottom_nav.offset_left = 0
@@ -668,36 +669,73 @@ func _build_notifications_section() -> void:
 
 func _build_dm_section() -> void:
 	var panel = $MainPanel/DMPanel
+
+	var header = HBoxContainer.new()
+	header.name = "DMHeader"
+	header.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.custom_minimum_size = Vector2(0, 36)
+	header.visible = false
+	panel.add_child(header)
+
+	var back_btn = Button.new()
+	back_btn.name = "DMBackBtn"
+	back_btn.text = "←"
+	back_btn.flat = true
+	back_btn.custom_minimum_size = Vector2(36, 36)
+	back_btn.visible = false
+	header.add_child(back_btn)
+
+	var header_label = Label.new()
+	header_label.name = "DMHeaderLabel"
+	header_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	header_label.add_theme_color_override("font_color", Color(0.5, 0.7, 1))
+	header.add_child(header_label)
+
 	var scroll = ScrollContainer.new()
 	scroll.name = "DMScroll"
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	panel.add_child(scroll)
 	var vbox = VBoxContainer.new()
 	vbox.name = "DMList"
+	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vbox.add_theme_constant_override("separation", 2)
 	scroll.add_child(vbox)
 
-	var input_hbox = HBoxContainer.new()
-	input_hbox.name = "DMInputBar"
-	panel.add_child(input_hbox)
+	var input_vbox = VBoxContainer.new()
+	input_vbox.name = "DMInputBar"
+	input_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.add_child(input_vbox)
 
 	var dm_pk = LineEdit.new()
 	dm_pk.name = "DMPubkey"
-	dm_pk.placeholder_text = "送信先 pubkey hex"
+	dm_pk.placeholder_text = "送信先 npub / hex"
 	dm_pk.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	input_hbox.add_child(dm_pk)
+	dm_pk.custom_minimum_size = Vector2(0, 32)
+	input_vbox.add_child(dm_pk)
 
-	var dm_input = LineEdit.new()
+	var hbox = HBoxContainer.new()
+	hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	input_vbox.add_child(hbox)
+
+	var dm_input = TextEdit.new()
 	dm_input.name = "DMMessage"
 	dm_input.placeholder_text = "DMを入力..."
 	dm_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	input_hbox.add_child(dm_input)
+	dm_input.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	dm_input.custom_minimum_size = Vector2(0, 60)
+	dm_input.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hbox.add_child(dm_input)
 
 	var dm_send = Button.new()
 	dm_send.name = "DMSendButton"
 	dm_send.text = "送信"
+	dm_send.custom_minimum_size = Vector2(64, 0)
+	dm_send.size_flags_vertical = Control.SIZE_SHRINK_END
+	hbox.add_child(dm_send)
+
+	back_btn.pressed.connect(_on_dm_back)
 	dm_send.pressed.connect(_on_dm_send)
-	input_hbox.add_child(dm_send)
 
 func _build_profile_section() -> void:
 	var panel = $MainPanel/ProfilePanel
@@ -2188,30 +2226,68 @@ func _on_nostr_direct_message(url: String, subscription_id: String, event_dict: 
 
 	if _current_section == Section.DM:
 		_refresh_dms()
+		if _dm_selected_sender == counterparty:
+			var list_vbox = $MainPanel/DMPanel/DMScroll/DMList
+			var scroll = $MainPanel/DMPanel/DMScroll as ScrollContainer
+			await get_tree().process_frame
+			scroll.scroll_vertical = int(list_vbox.size.y)
 
 func _refresh_dms() -> void:
 	var list_vbox = $MainPanel/DMPanel/DMScroll/DMList
 	for child in list_vbox.get_children():
 		child.queue_free()
 
+	var back_btn = $MainPanel/DMPanel/DMHeader/DMBackBtn as Button
+	var header_label = $MainPanel/DMPanel/DMHeader/DMHeaderLabel as Label
+	var pk_input = $MainPanel/DMPanel/DMInputBar/DMPubkey as LineEdit
+
 	if _dm_conversations.is_empty():
+		back_btn.visible = false
+		header_label.text = ""
+		$MainPanel/DMPanel/DMHeader.hide()
 		var empty_label = Label.new()
 		empty_label.text = "DMはありません"
+		empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		empty_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		empty_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
 		list_vbox.add_child(empty_label)
 		return
 
-	for sender in _dm_conversations:
-		var msgs = _dm_conversations[sender]
-		var name_str = sender.left(12) + "..."
-		if profile_cache.has(sender) and profile_cache[sender] is Dictionary:
-			name_str = profile_cache[sender].get("display_name", profile_cache[sender].get("name", name_str))
+	if _dm_selected_sender.is_empty():
+		$MainPanel/DMPanel/DMHeader.hide()
+		back_btn.visible = false
+		pk_input.editable = true
+		for sender in _dm_conversations:
+			var msgs = _dm_conversations[sender]
+			var name_str = sender.left(12) + "..."
+			if profile_cache.has(sender) and profile_cache[sender] is Dictionary:
+				name_str = profile_cache[sender].get("display_name", profile_cache[sender].get("name", name_str))
+			var npub = Secp256k1.npub_encode(sender)
 
-		var header = Label.new()
-		header.text = "--- " + name_str + " ---"
-		header.add_theme_color_override("font_color", Color(0.5, 0.7, 1))
-		list_vbox.add_child(header)
+			var btn = Button.new()
+			btn.flat = true
+			btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			btn.custom_minimum_size = Vector2(0, 44)
+			var last_msg = msgs[-1].get("content", "") if msgs.size() > 0 else ""
+			var preview = last_msg.left(40)
+			if last_msg.length() > 40:
+				preview += "..."
+			btn.text = name_str + "\n" + npub.left(16) + "  " + preview
+			btn.add_theme_color_override("font_color", Color(0.85, 0.85, 0.9))
+			btn.add_theme_font_size_override("font_size", 12)
+			list_vbox.add_child(btn)
+			btn.pressed.connect(_on_dm_conversation_selected.bind(sender))
+	else:
+		$MainPanel/DMPanel/DMHeader.show()
+		back_btn.visible = true
+		var name_str = _dm_selected_sender.left(12) + "..."
+		if profile_cache.has(_dm_selected_sender) and profile_cache[_dm_selected_sender] is Dictionary:
+			name_str = profile_cache[_dm_selected_sender].get("display_name", profile_cache[_dm_selected_sender].get("name", name_str))
+		header_label.text = name_str
+		pk_input.text = _dm_selected_sender
+		pk_input.editable = false
 
+		var msgs = _dm_conversations[_dm_selected_sender]
 		for msg in msgs:
 			var content = msg.get("content", "")
 			var time = msg.get("created_at", 0)
@@ -2219,6 +2295,7 @@ func _refresh_dms() -> void:
 
 			var msg_label = Label.new()
 			msg_label.text = time_str + " " + content
+			msg_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			msg_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			msg_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.85))
 			list_vbox.add_child(msg_label)
@@ -2434,15 +2511,32 @@ func _handle_bookmark_content_event(event_dict: Dictionary) -> void:
 		if _current_section == Section.BOOKMARKS:
 			_refresh_bookmarks()
 
+func _on_dm_conversation_selected(sender: String) -> void:
+	_dm_selected_sender = sender
+	_refresh_dms()
+
+func _on_dm_back() -> void:
+	_dm_selected_sender = ""
+	_refresh_dms()
+
 func _on_dm_send() -> void:
 	if not NostrGD.IsLoggedIn:
 		return
-	var target = $MainPanel/DMPanel/DMInputBar/DMPubkey.text.strip_edges()
-	var content = $MainPanel/DMPanel/DMInputBar/DMMessage.text.strip_edges()
-	if content.is_empty() or target.is_empty():
+	var raw_target = $MainPanel/DMPanel/DMInputBar/DMPubkey.text.strip_edges()
+	if raw_target.is_empty():
+		return
+	var target = raw_target
+	if target.begins_with("npub"):
+		target = Secp256k1.npub_decode(target)
+		if target.is_empty():
+			status_label.text = "無効なnpubです"
+			return
+	var dm_input = $MainPanel/DMPanel/DMInputBar/HBoxContainer/DMMessage as TextEdit
+	var content = dm_input.text.strip_edges()
+	if content.is_empty():
 		return
 	NostrGD.SendDirectMessage(content, target)
-	$MainPanel/DMPanel/DMInputBar/DMMessage.clear()
+	dm_input.text = ""
 	status_label.text = "DMを送信しました"
 
 func _on_image_upload_button() -> void:
@@ -2477,10 +2571,9 @@ func _on_image_file_selected(path: String) -> void:
 						current_text += "\n"
 					message_input.text = current_text + url
 					status_label.text = "画像URLを挿入しました"
-		return
-
-	if not pool_timer.is_processing():
-		pool_timer.start()
+					return
+		if not pool_timer.is_processing():
+			pool_timer.start()
 			status_label.text = "URLが取得できませんでした。手動でURLを貼ってください。"
 		else:
 			status_label.text = "アップロード失敗(" + str(response_code) + ")。手動で画像URLを貼ってください。"
