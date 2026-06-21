@@ -28,6 +28,7 @@ NostrGD="*uid://b2kfiyir2ccuw"
 
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/stretch/scale=2.0
 
 [dotnet]
 
