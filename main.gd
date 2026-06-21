@@ -162,6 +162,13 @@ func _ready() -> void:
 	$MainPanel/ScrollContainer.clip_contents = true
 	$MainPanel/ScrollContainer/Timeline.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
+	if OS.has_feature("web"):
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		JavaScriptBridge.eval("""
+			var c = document.querySelector('canvas');
+			if (c) c.style.touchAction = 'none';
+		""")
+
 	var img_btn = Button.new()
 	img_btn.icon = _get_icon("image")
 	img_btn.text = ""
@@ -661,6 +668,7 @@ func _build_notifications_section() -> void:
 	scroll.name = "NotifScroll"
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.clip_contents = true
 	panel.add_child(scroll)
 	var vbox = VBoxContainer.new()
 	vbox.name = "NotifList"
@@ -696,6 +704,7 @@ func _build_dm_section() -> void:
 	var scroll = ScrollContainer.new()
 	scroll.name = "DMScroll"
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.clip_contents = true
 	panel.add_child(scroll)
 	var vbox = VBoxContainer.new()
 	vbox.name = "DMList"
@@ -757,6 +766,7 @@ func _build_profile_section() -> void:
 	scroll.name = "ProfileScroll"
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.clip_contents = true
 	panel.add_child(scroll)
 
 	var margin = MarginContainer.new()
@@ -836,6 +846,7 @@ func _build_settings_section() -> void:
 	scroll.name = "SettingsScroll"
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.clip_contents = true
 	panel.add_child(scroll)
 
 	var margin = MarginContainer.new()
@@ -1052,6 +1063,7 @@ func _build_bookmarks_section() -> void:
 	scroll.name = "BookmarkScroll"
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.clip_contents = true
 	panel.add_child(scroll)
 	var vbox = VBoxContainer.new()
 	vbox.name = "BookmarkList"
@@ -1140,13 +1152,14 @@ func _refresh_profile() -> void:
 		banner.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		banner.clip_contents = true
 		panel.add_child(banner)
-		var scroll = ScrollContainer.new()
-		scroll.name = "ProfileScroll"
-		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		panel.add_child(scroll)
-		var margin = MarginContainer.new()
-		margin.name = "ProfileMargin"
+	var scroll = ScrollContainer.new()
+	scroll.name = "ProfileScroll"
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.clip_contents = true
+	panel.add_child(scroll)
+	var margin = MarginContainer.new()
+	margin.name = "ProfileMargin"
 		margin.add_theme_constant_override("margin_left", 16)
 		margin.add_theme_constant_override("margin_right", 16)
 		margin.add_theme_constant_override("margin_top", 16)
