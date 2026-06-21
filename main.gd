@@ -128,7 +128,7 @@ var _relays_notif_subscribed: Dictionary = {}
 var _relays_dm_subscribed: Dictionary = {}
 const SIDEBAR_WIDTH: int = 280
 const DESKTOP_BREAKPOINT: int = 800
-const BOTTOM_NAV_HEIGHT: int = 56
+const BOTTOM_NAV_HEIGHT: int = 64
 const BTN_MQ: int = 38
 const BTN_MQ_TALL: int = 44
 var _touch_start_x: float = -1.0
@@ -480,11 +480,12 @@ func _setup_mobile_bottom_nav() -> void:
 	for i in icon_names.size():
 		var btn := Button.new()
 		btn.flat = true
-		btn.icon = _get_icon(icon_names[i], 20)
+		btn.icon = _get_icon(icon_names[i], 24)
 		btn.tooltip_text = ["タイムライン", "通知", "DM", "プロフィール", "ブックマーク", "設定"][i]
 		btn.custom_minimum_size = Vector2(0, BOTTOM_NAV_HEIGHT)
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		btn.add_theme_constant_override("icon_max_width", 28)
 		var section_index = [Section.TIMELINE, Section.NOTIFICATIONS, Section.DM, Section.PROFILE, Section.BOOKMARKS, Section.SETTINGS][i]
 		btn.pressed.connect(_on_bottom_nav_pressed.bind(section_index))
 		hbox.add_child(btn)
